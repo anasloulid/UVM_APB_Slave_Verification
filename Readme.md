@@ -34,29 +34,7 @@ Les objectifs principaux sont :
 
 
 
-######                                                                          Testbench Top
-
-######                                                                             ├── Générateur d’horloge et de reset
-
-######                                                                             ├── Interface APB (intf)
-
-######                                                                             ├── DUT (apb\_slave)
-
-######                                                                             └── UVM Environment (APB\_ENV)
-
-######                                                                                      ├── Agent (APB\_AGENT)
-
-######                                                                                      │     ├── Driver (APB\_DRIVER)
-
-######                                                                                      │     ├── Monitor (APB\_MONITOR)
-
-######                                                                                      │     └── Sequencer (APB\_SEQUENCER)
-
-######                                                                                      ├── Scoreboard (APB\_SCOREBOARD)
-
-######                                                                                      └── Modèle de référence
-
-###### **Composants clés**
+######                                                                         **Composants clés**
 
 
 
@@ -250,47 +228,7 @@ Testbench : génère l’horloge, le reset et configure l’interface virtuelle 
 
 
 
-Schéma simplifié :
-
 ###### 
 
-######           APB\_SEQUENCE
-
-######                │
-
-######                ▼
-
-######          APB\_SEQUENCER
-
-######                │
-
-######                ▼
-
-######           APB\_DRIVER
-
-######                │
-
-######                ▼
-
-######               DUT
-
-######                │
-
-######                ▼
-
-######          APB\_MONITOR ────────────────
-
-######                │                    │
-
-######                ▼                    ▼
-
-######              SCOREBOARD <─ APB\_REFERENCE
-
-######                │
-
-######                ▼
-
-######        Log Pass / Error
-
-###### 
+######   
 
