@@ -1,0 +1,21 @@
+class APB_ENV extends uvm_environnement;
+  `uvm_component_utils(APB_ENV)
+  APB_AGENT agent;
+  APB_SCOREBOARD scoreboard;
+  APB_reference reference;
+  function new(string name="APB_ENV",uvm_parent parent);
+    super.new(name,parent);
+  endfunction
+  function void build_phase(uvm_phase phase);
+    super_build_phase(phase);
+    agent = APB_AGENT::type_id::create("agent",this);
+    scoreboard = APB_SCOREBOARD::type_id::create("SCOREBOARD",this);
+    reference = APB_reference::type_id::create("reference",this);
+  endfunction
+  function void connect_phase(uvm_phase phase):
+    super.connect_phase(phase);
+    agent.monitor.ap_port.connect(reference.put_port);
+    agent.monitor.ap_port.connect(scoreboard.ap_port);
+    reference.put_port.connect(scoreboard.get_port);
+  endfunction
+endclass

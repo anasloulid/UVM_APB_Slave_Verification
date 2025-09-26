@@ -1,0 +1,84 @@
+// Code your testbench here
+// or browse Examples
+// include means copy and paste the code
+`include "uvm_macros.svh"
+`include "APB_pkg.sv"
+//import means u have access to use the tools inside the package
+import uvm_pkg::*;
+import pkg::*:
+//top level test bench
+module tb;
+  //define clock and resetn
+  bit Pclk;
+  bit Presetn;
+  //intiantiate the interface (driven by testbench and connect it with the clck)
+  intf inf(Pclk);
+  //clock generation 
+  initial begin
+    Pclk = 0;
+    forever begin 
+      #5;
+      Pclk = ~Pclk;
+    end
+  end
+  // reset generation
+  initial begin
+    Prestn = 1'b0;
+    #20;
+    Prestn = 1'b1;
+  end
+  // DUT initailisation with connecting his ports to the  interface port 
+  apb_slave DUT(
+    .Prestn(inf.Prestn),
+    .Penable(inf.Penable),
+    .Psel(inf.Psel),
+    .Pwrite(inf.Pwrite),
+    .Paddr(inf.Paddr),
+    .Pwdata(inf.Pwdata),
+    .Prdata(inf.Prdata),
+    .Pready(inf.Pready),
+    .Pslverr(inf.Pslverr),
+  );
+  //set the virtual interface in the configuration db
+  initial begin
+    uvm_config_db #(virtual intf)::set(NULL,"*","inf",inf);
+  end
+    // Dumping Waveforms to visualize the signals
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0, tb);
+  end
+  //runing the test
+  initial begin
+    run_test("APB_test");
+    
+  end
+endmodule
+  
+    
+      
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

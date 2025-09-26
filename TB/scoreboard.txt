@@ -1,0 +1,57 @@
+class APB_SCOREBOARD extends uvm_scoreboard;
+  `uvm_component_utils(APB_SCOREBOARD)
+  uvm_analysis_imp #(APB_TRANS) ap_port;
+  uvm_analysis_get_port #(APB_TRANS,APB_SCOREBOARD) get_port;
+  APB_TRANS actual[$];
+  APB_TRANS expected[$];
+  
+  function new(string name="APB_ENV",uvm_parent parent);
+    super.new(name,parent);
+    ap_port = new("ap_port");
+    get_port = new("get_port");
+  endfunction
+  //push back trans venu du driver et appel de fonction compare
+  function void write(APB_TRANS trans);
+    //remplir premier pile(actual)
+    actual.push_back(trans);
+      `uvm_info(get_type_name(),
+      $sformatf("SCOREBOARD: Received DUT transaction ADDR=0x%0h DATA=0x%0h",
+                trans.PADDR, (trans.Pwrite ? trans.PWDATA : trans.Prdata)),
+      UVM_LOW)
+    compare();
+  endfunction
+  
+    //definition de put
+  task put(APB_TRANS trans);
+    //remplir la deusieme pile(expected)
+    expected.push_back(trans);
+     
+    `uvm_info(get_type_name(),
+      $sformatf("SCOREBOARD: Received GOLDEN transaction ADDR=0x%0h DATA=0x%0h",
+                ref_trans.PADDR, ref_trans.PRDATA),
+      UVM_LOW)
+    compare();
+  endtask
+  //definition de la fonction compare
+  function void compre();
+    if (actual.size() > 0 && expected.size() > 0) begin
+      APB_TRANS act = actual.pop_front();
+      APB_TRANS exp = expected.pop_front();
+      // comparer juste dans read car il verifie si le data se trouve
+      if(!act.Pwrite) begin
+        if(act.Prdata ==! exp.Prdata) begin
+          `uvm_error(get_type_name(),
+            $sformatf("Mismatch at ADDR=0x%0h: Expected=0x%0h, Got=0x%0h",
+                      exp.PADDR, exp.PRDATA, act.PRDATA))
+        end
+        else begin
+                    `uvm_info(get_type_name(),
+                    $sformatf("Match at ADDR=0x%0h: DATA=0x%0h (PASS------------)",
+                      exp.Paddr, exp.Prdata),
+            UVM_LOW)
+        end
+      end
+    end
+  endfunction
+  
+endclass

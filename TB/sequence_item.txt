@@ -1,0 +1,54 @@
+class APB_TRANS extends uvm_sequence_item;
+  function new(string name= "APB_TRANS");
+    super.new(name);
+  endfunction
+  //data members
+  //randomise data (randomise data sent by the sequencer)
+  rand bit Pwrite;
+  rand bit [`ADDR_WIDTH-1:0] Paddr; 
+  rand bit [`ADDR_WIDTH-1:0] Pwdata;
+  //data sent by the DUT to the monitor
+  bit Penable;
+  bit Psel;
+  bit Prdata;
+  bit Pslverr;
+  bit Pready;
+  //This macro block registers your transaction class APB_TRANS with the UVM factory and tells UVM to automatically manage and print all APB signals (PADDR, PENABLE, PSEL, …) without writing extra boilerplate code.
+  `uvm_object_utils_begin(APB_TRANS)
+    `uvm_field_int(PADDR,   UVM_ALL_ON + UVM_DEC)
+    `uvm_field_int(PWDATA,  UVM_ALL_ON + UVM_DEC)
+    `uvm_field_int(PRDATA,  UVM_ALL_ON + UVM_DEC)
+    `uvm_field_int(PSEL,    UVM_ALL_ON + UVM_DEC)
+    `uvm_field_int(PENABLE, UVM_ALL_ON + UVM_DEC)
+    `uvm_field_int(PSLVERR, UVM_ALL_ON + UVM_DEC)
+    `uvm_field_int(PREADY,  UVM_ALL_ON + UVM_DEC)
+    `uvm_field_int(PWRITE,  UVM_ALL_ON + UVM_DEC)
+  `uvm_object_utils_end
+    constraint address_range
+  {
+    soft PADDR inside {[0:1]};
+  }
+
+  constraint PWRITE_logic
+  {
+    PWRITE dist {1:=70,0:=30};
+  }
+endclass
+ 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+endclass

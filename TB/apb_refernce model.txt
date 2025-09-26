@@ -1,0 +1,54 @@
+// Description: APB Reference Model for Scoreboard Comparison
+//the reference is included in evenvironnement
+class APB_reference extends uvm_component;
+  
+  `uvm_component_utils(APB_reference)
+  // le type de data est TRAN et APB_reference est celui qui a le port
+  uvm_analysis_port #(APB_TRANS, APB_reference) ap_port;
+  
+  //Ce type de port sert a  envoye une transaction et une fonction put envoie et bloque       //envoi jusqu au le destinataire accepte la transaction
+  uvm_blocking_put_port #(APB_TRANS) put_port;
+  
+  //act like dut memory de 8 bits
+  bit [`ADDR_WIDTH-1:0] mem[int];
+  
+  function new(string name= "APB_reference_model",uvm_parent parent);
+    super.new(name,parent);
+    ap_port = new("ap_port");
+    put_port = new("put_port");
+  endfunction
+  
+  //write method
+  function void write(APB_TRANS trans);
+    APB_TRANS APB_ref;
+    APB_ref = APB_TRANS::type_id::create("APB_ref");
+    //si le driver a demande une ecriture, le monitor utilise la fonction write et enregiste le data a write dans un mem
+    if(trans.Pwrite) begin
+      //update the data dans mem
+      mem[trans.Paddr] = trans.Pwdata;
+      `uvm_info(get_type_name(),
+        $sformatf("Reference Model WRITE stored: ADDR=0x%0h DATA=0x%0h",
+                  trans.PADDR, trans.PWDATA),
+        UVM_MEDIUM)
+    end
+    else begin
+      if (mem.exists(trans.Paddr)) begin
+        APB_ref.Prdata = mem[trans.Paddr];
+      end
+      else
+        APB_ref = 0;
+    end
+     fork
+       //ref_trans traiter par la memoire, et envoye a le scoreboard
+        automatic APB_TRANS tmp = APB_ref;
+       //tmp est blocke jusqau le monitor est pret pour recevoir tmp
+       //put est une fonction comme write
+        put_port.put(tmp);
+      join_none
+    end
+      
+    
+    
+    
+    
+endclass

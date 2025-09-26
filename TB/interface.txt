@@ -1,0 +1,32 @@
+`include "APB_define.sv"
+//define interface ports and put clk as his input to connect it with DUT
+interface intf(input bit Pclk);
+  logic Prestn;
+  logic Penable;
+  logic Psel;
+  logic Pwrite;
+  //Paddr and Pwdata are [7:0]
+  logic [`ADDR_WIDTH-1:0] Paddr;
+  logic [`DATA_WIDTH-1:0] Pwdata;
+  logic [`DATA_WIDTH] Prdata;
+  logic Pready;
+  logic Pslverr;
+  // clocking block is a group of signals of assosiated with a specific clock edge,     //which specifies when and how the signals are driven and sampled (driver/monitor)
+  //DRV_CB → pour piloter et lire côté driver.
+  //MON_CB → pour observer côté monitor.
+  //Ça permet de séparer clairement les responsabilités et d’éviter les courses (race   //conditions) entre l’écriture du driver et la lecture du monitor/DUT.
+  clocking DRV_CB @(posedge PCLK);
+    default input #1 output #0;
+    output PSEL,PENABLE,PWDATA,PADDR,PWRITE,PRESETn;
+    input  PREADY,PRDATA,PSLVERR;
+  endclocking 
+  
+  clocking MON_CB @(posedge PCLK);
+    default input #1 output #0;
+    input PSEL,PENABLE,PWDATA,PADDR,PWRITE;
+    input  PREADY,PRDATA,PSLVERR;
+  endclocking 
+endinterface
+  
+  
+  

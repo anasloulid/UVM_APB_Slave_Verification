@@ -1,0 +1,98 @@
+module apb_slave(
+  //identifier les porte I/O
+  input Pclk,
+  input Prestn,
+  input Penable,
+  input Psel,
+  input Pwrite,
+  input [0:7] Paddr,
+  input [0:7] Pwdata,
+  output reg [0:7] Prdata,
+  output reg Pready,
+  output reg Pslverr,
+);
+  parameter N = 4;//wait states number
+  reg [0:7] mem [0:7];//memoire de 8*8
+  reg [0:2] wait_counter;//counter of wait states
+  reg transaction_valide = 0;//indicates valid transaction
+  
+  always @(posedge Pclk or negedge Prestn) begin
+    if (!Prestn) begin //si on fait un reset
+      //on initialise les outputs et la memoire de slave 
+      Pready <= 0;
+      Pslverr <= 0;
+      Prdata <= 8'b0;
+      transaction_valide <= 0;
+      wait_counter <= 3'b0;
+      for (integer i=0; i < 8; i = i + 1) begin
+        mem[i] <= 8'b0;
+      end
+    end
+    else begin
+      Pslverr <= 0;//default no error
+      //si  on est a la phase de SETUP 
+      if (Psel && Penable && !transaction_valide) begin
+        transaction_valide <= 1; 
+        wait_counter <= 0;
+        Pready <= 0;
+      end
+      //on attend Pready venu de l esclave
+      if (transaction_valide) begin
+        if (wait_counter < N -1 ) begin
+          wait_counter <= wait_counter + 1;
+        end
+        else begin
+          // on a attendu , maitenant on met pready a 1
+        Pready <= 1;
+        transaction_valide <= 0;
+          // maitenant on est a la phase d access, j etudie si je veux ecrire ou lire 
+        if (Pwrite) begin
+          if (Paddr == 8'h10 || Paddr == 8'h11) begin
+            Pselverr <= 1;
+          end
+          else begin
+            mem[Paddr[2:0]]<= Pwdata;
+          end
+        end
+        else begin
+          Prdata <= mem[Paddr[2:0]];
+        end
+        end
+      end
+      else begin 
+        //
+         PREADY <= 0; 
+      end
+    end
+  end
+
+endmodule
+
+        
+            
+            
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+      
+        
+        
+      
+      
+      
+      
+  

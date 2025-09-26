@@ -1,0 +1,19 @@
+class APB_AGENT extends uvm_agent;
+  `uvm_component_utils(APB_AGENT)
+  APB_SEQUENCER sequencer;
+  APB_MONITOR monitor;
+  APB_DRIVER driver;
+  function new(string name="APB_AGENT",uvm_parent parent);
+    super.new(name,parent);
+  endfunction
+  function void build_phase(uvm_phase phase);
+    super_build_phase(phase);
+    sequencer = APB_SEQUENCER::type_id::create("sequencer",this);
+    monitor = APB_MONITOR::type_id::create("monitor",this);
+    driver = APB_DRIVER::type_id::create("driver",this);
+  endfunction
+  function void connect_phase(uvm_phase phase):
+    super.connect_phase(phase);
+    driver.seq_item_port(sequencer.seq_item_export);
+  endfunction
+endclass

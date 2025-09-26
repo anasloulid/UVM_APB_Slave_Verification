@@ -1,0 +1,57 @@
+class APB_DRIVER extends uvm_driver;
+  `uvm_component_utils(APB_DRIVER)
+  APB_INTERFACE intf;
+  APB_TRANS seq;
+  function new(string name="APB_DRIVER",uvm_parent parent);
+    super.new(name,parent);
+  endfunction
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    if(!uvm_config_db#(virtual intf)::get(this,"",intf,"intf"))
+      `uvm_fatal(get_type_name(), "Interface not set in config DB")
+  endfunction
+      task run_phase(uvm_phase phase);
+      forever begin
+        seq_item_port.get_next_item(seq);
+        //ici le driver se comprote comme un master 
+        send_to_dut(seq);
+        seq_item_port.item_done(seq);
+      end
+    task send_to_dut(APB_TRANS);
+      //SETUP PHASE
+      @(posedge intf.Pclk);
+      intf.DRV_CB.Pwdata <= seq.Pwdata;
+      intf.DRV_CB.Prdata <= seq.Prdata;
+      intf.DRV_CB.Paddr <= seq.Paddr;
+      intf.DRV_CB.Psel<= 1;
+      intf.DRV_CB.Penable<= 0;
+      intf.DRV_CB.Presetn<= 1;
+      //ENABLE PHASE
+      @(posedge intf.Pclk);
+      intf.DRV_CB.Penable<= 1;
+      //wait for Pready
+      wait(intf.DRV_CB.Pready == 1)
+      //ready for slave respond
+      @(posedge inf.PCLK);
+      intf.DRV_CB.Psel<= 1;
+      intf.DRV_CB.Penable<= 0;
+      `uvm_info(get_type_name(),
+      $sformatf("APB %s transfer completed: ADDR=0x%0h, DATA=0x%0h",
+      (req.Pwrite ? "WRITE" : "READ"),
+       req.Paddr,
+       (req.Pwrite ? req.Pwdata : inf.DRV_CB.Prdata)),
+                endtask
+ endclass
+                
+                
+                
+      
+      
+      
+      
+      
+      
+      
+    
+      endtask
+endclass

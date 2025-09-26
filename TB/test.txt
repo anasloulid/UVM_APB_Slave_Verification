@@ -1,0 +1,28 @@
+class APB_TEST extends uvm_test;
+  //register APB_TEST WITH UVM COMPONENT
+  `uvm_component_utils(APB_TEST)
+  //instantiation du environnement et du sequences
+  APB_ENV env;
+  APB_SEQUENCE sequences;
+  //constructeur et constructeur parent
+  function new(string name= "APB_TEST",uvm_component parent);
+    super.new(name,parent);
+  endfunction
+  //build phase
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    env = APB_env::type_id::create("env",this);
+    sequences = APB_SEQUENCE::type_id::create("sequences",this);
+  endfunction
+  //task is not function cause it takes time
+  task run_phase(uvm_phase phase);
+    super.run_phase(phase);
+    //tells the UVM don t stop the run phase 
+    phase.raise_objection(this);
+    //start the sequences in the instance called sequencer
+    sequences.start(env.agent.esquencer);
+    phase.drope_objection(this);
+  endtask
+endclass
+  
+  

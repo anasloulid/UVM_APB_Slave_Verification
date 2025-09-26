@@ -1,0 +1,76 @@
+class APB_MONITOR extends uvm_monitor;
+  `uvm_component_utils(APB_MONITOR)
+  //declare a port to send transaction to scoreboard
+  uvm_analysis_port #(APB_TRANS) ap_port;
+  APB_INTERFACE intf;
+  APB_TRANS req;
+  
+  function new(string name="APB_MONITOR",uvm_parent parent);
+    super.new(name,parent);
+    //Pourquoi ap_port est dans new et pas dans build_phase ? Parce que ap_port n’est     //pas un composant UVM (comme un monitor ou un driver), c’est juste un TLM port       //(un objet léger qui n’a pas de phases UVM).
+    ap_port = new ("ap_port", this);
+  endfunction
+  //build_phase Sert à construire la hiérarchie des composants UVM (création de sous-   //composants via uvm_component_utils::create).
+  function void build_phase(uvm_phase phase);
+    super_build_phase(phase);
+    if(!uvm_config_db#(virtual intf)::get(this,"",intf,"intf")) begin
+      `uvm_fatal(get_type_name(), "Interface not set in config DB")
+    end
+    `uvm_info(get_type_name(), "Build phase completed, interface received", UVM_LOW)
+  endfunction
+  //RUN PHASE
+  task run_phase(uvm_phase phase);
+    super.run_phase(phase);
+    req = APB_TRANS::type_id::create("req");
+    forever begin
+      get_from_dut();
+      end
+  endtask
+ //connect phase
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+  endfunction
+  //task get_from_dut get the transaction from dut and send it via analysis port
+  task get_from_dut(APB_TRANS);
+    //wait jusqu au APB transaction is valid 
+    @((intf.MON_CB) iff (intf.MON_CB.Psel & intf.MON_CB.Penable & intf.MON_CB.Pready))
+    `uvm_info(get_type_name(),"Monitor Invoked",UVM_LOW)
+    //sample signals
+    req.Paddr = intf.MON_CB.Paddr;
+    req.Pwrite = intf.MON_CB.Pwrite;
+    req.Pslverr = intf.MON_CB.Pslverr;
+    if(req.Pwrite) begin
+      req.Pwdata = intf.MON_CB.Pwdata;
+      `uvm_info(get_type_name(), $sformatf("Captured WRITE to addr=0x%0h data=0x%0h", 
+      req.PADDR, req.PWDATA), UVM_MEDIUM)
+    end
+    else begin
+      req.Prdata = intf.MON_CB.Prdata;
+      `uvm_info(get_type_name(), $sformatf("Captured READ from addr=0x%0h data=0x%0h", 
+                                           req.PADDR, req.PRDATA), UVM_MEDIUM)
+    end
+    //send data via analysis port
+    ap_port.write(req);
+     endtask
+endclass
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+endclass
