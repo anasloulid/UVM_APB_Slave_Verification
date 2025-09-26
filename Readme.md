@@ -26,7 +26,7 @@ Les objectifs principaux sont :
 
 
 
-&nbsp;
+ 
 
 
 
@@ -34,27 +34,27 @@ Les objectifs principaux sont :
 
 
 
-###### &nbsp;                                                                        Testbench Top
+######                                                                          Testbench Top
 
-###### &nbsp;                                                                           ├── Générateur d’horloge et de reset
+######                                                                             ├── Générateur d’horloge et de reset
 
-###### &nbsp;                                                                           ├── Interface APB (intf)
+######                                                                             ├── Interface APB (intf)
 
-###### &nbsp;                                                                           ├── DUT (apb\_slave)
+######                                                                             ├── DUT (apb\_slave)
 
-###### &nbsp;                                                                           └── UVM Environment (APB\_ENV)
+######                                                                             └── UVM Environment (APB\_ENV)
 
-###### &nbsp;                                                                                    ├── Agent (APB\_AGENT)
+######                                                                                      ├── Agent (APB\_AGENT)
 
-###### &nbsp;                                                                                    │     ├── Driver (APB\_DRIVER)
+######                                                                                      │     ├── Driver (APB\_DRIVER)
 
-###### &nbsp;                                                                                    │     ├── Monitor (APB\_MONITOR)
+######                                                                                      │     ├── Monitor (APB\_MONITOR)
 
-###### &nbsp;                                                                                    │     └── Sequencer (APB\_SEQUENCER)
+######                                                                                      │     └── Sequencer (APB\_SEQUENCER)
 
-###### &nbsp;                                                                                    ├── Scoreboard (APB\_SCOREBOARD)
+######                                                                                      ├── Scoreboard (APB\_SCOREBOARD)
 
-###### &nbsp;                                                                                    └── Modèle de référence 
+######                                                                                      └── Modèle de référence
 
 ###### **Composants clés**
 
@@ -252,51 +252,45 @@ Testbench : génère l’horloge, le reset et configure l’interface virtuelle 
 
 Schéma simplifié :
 
-
-
-
-
-
-
 ###### 
 
-###### &nbsp;         APB\_SEQUENCE
+######           APB\_SEQUENCE
 
-###### &nbsp;              │
+######                │
 
-###### &nbsp;              ▼
+######                ▼
 
-###### &nbsp;        APB\_SEQUENCER
+######          APB\_SEQUENCER
 
-###### &nbsp;              │
+######                │
 
-###### &nbsp;              ▼
+######                ▼
 
-###### &nbsp;         APB\_DRIVER
+######           APB\_DRIVER
 
-###### &nbsp;              │
+######                │
 
-###### &nbsp;              ▼
+######                ▼
 
-###### &nbsp;             DUT
+######               DUT
 
-###### &nbsp;              │
+######                │
 
-###### &nbsp;              ▼
+######                ▼
 
-###### &nbsp;        APB\_MONITOR ────────────
+######          APB\_MONITOR ────────────────
 
-###### &nbsp;              │                    │
+######                │                    │
 
-###### &nbsp;              ▼                    ▼
+######                ▼                    ▼
 
-###### &nbsp;            SCOREBOARD <─ APB\_REFERENCE
+######              SCOREBOARD <─ APB\_REFERENCE
 
-###### &nbsp;              │
+######                │
 
-###### &nbsp;              ▼
+######                ▼
 
-###### &nbsp;      Log Pass / Error
+######        Log Pass / Error
 
 ###### 
 
